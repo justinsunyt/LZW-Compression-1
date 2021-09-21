@@ -16,7 +16,7 @@ public class LZW {
 			encodeDictionary.put("" + (char)i, i);
 		}
 		
-		BufferedReader reader = new BufferedReader (new FileReader(inputFile));
+		BufferedReader reader = new BufferedReader(new FileReader(inputFile));
 		
 		int i = 256;
 		String current = "" + (char)reader.read();
@@ -30,7 +30,9 @@ public class LZW {
 			if (encodeDictionary.containsKey(cAndN)){
 				current = current + next;
 			} else {
-				encodeDictionary.put(cAndN, i);
+				if (encodeDictionary.size() < 512) { // limit to 9 bits
+					encodeDictionary.put(cAndN, i);
+				}
 				i++;
 				encodedAscii.add(encodeDictionary.get(current));
 				current = next;
@@ -38,6 +40,11 @@ public class LZW {
 		}
 		encodedAscii.add(encodeDictionary.get(current));
 		reader.close();
+		BufferedWriter writer = new BufferedWriter(new FileWriter("compressedFile.txt"));
+		for (Integer ascii : encodedAscii) {
+			writer.write(ascii + " ");
+		}
+		writer.close();
 		System.out.println("File Compressed");
 		return encodedAscii;
 	}
